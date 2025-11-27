@@ -1,31 +1,29 @@
-Roteiro para modificar Lubuntu para RTOS (Real-Time Operating System)
+# 🧩 Roteiro para transformar Lubuntu em um RTOS (Real-Time Operating System)
 
-Este guia apresenta o passo a passo completo para compilar e instalar um kernel Linux com patch PREEMPT_RT, transformando Lubuntu em um sistema operacional de tempo real.
+Este guia apresenta o passo a passo completo para compilar e instalar um kernel Linux com o patch PREEMPT_RT, transformando o Lubuntu em um sistema operacional de tempo real.
 
----
+## 💽 Requisitos mínimos de hardware (VM VirtualBox)
 
-## 📋 Índice
-
-1. [Pré-requisitos](#pré-requisitos)
-2. [Atualização do Sistema](#1-atualização-do-sistema)
-3. [Instalação de Dependências](#2-instalação-de-dependências)
-4. [Download do Kernel e Patch RT](#3-download-do-kernel-e-patch-rt)
-5. [Aplicação do Patch PREEMPT_RT](#4-aplicação-do-patch-preempt_rt)
-6. [Configuração do Kernel](#5-configuração-do-kernel)
-7. [Compilação do Kernel](#6-compilação-do-kernel)
-8. [Instalação do Kernel](#7-instalação-do-kernel)
-9. [Configuração do GRUB](#8-configuração-do-grub)
-10. [Verificação da Instalação](#9-verificação-da-instalação)
-
----
-
-## Pré-requisitos
-
+Para evitar erros de build (falta de RAM, falta de espaço ou kernel sendo "Killed"):
 - [Imagem Lubuntu](https://cdimage.ubuntu.com/lubuntu/releases/noble/release/lubuntu-24.04.3-desktop-amd64.iso) - versão 24.04.3 LTS
-- [VirtualBox](https://www.virtualbox.org/wiki/Downloads) - Instalar em máquina virtual com minimo 30GB de espaço em disco.
-- Conexão com a internet
-- Pelo menos 30GB de espaço livre em disco
-- Pelo menos 8GB de RAM (recomendado)
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads) - Instalar em máquina virtual com minimo 60GB de espaço em disco.
+
+| Recurso | Recomendado | Mínimo absoluto |
+|--------|-------------|-----------------|
+| **RAM** | 8 GB | 4 GB |
+| **Disco** | **80 GB** | 60 GB |
+| **CPUs** | 4 | 2 |
+
+❗ **Por que 60 GB?**  
+Compilar kernel RT 6.x pode usar facilmente **12–20 GB** só no diretório de build.  
+Com 60GB, você **não precisa adicionar segundo disco, montar partições ou mexer em permissões.**
+
+## 📌 Recomendações antes de iniciar
+
+- Instale Lubuntu 24.04.3 LTS (ISO oficial)  
+- Ative 3D acceleration e I/O APIC no VirtualBox  
+- Use sistema de arquivos ext4  
+- Evite snapshots durante a compilação (crescem muito rápido)
 
 ---
 
