@@ -129,6 +129,18 @@ cp /boot/config-$(uname -r) .config
 ```
 **O que faz:** Copia a configuração do kernel atual como base para a nova compilação. `$(uname -r)` retorna a versão do kernel em execução.
 
+## 6. Desativar BTF
+```bash
+scripts/config --disable DEBUG_INFO_BTF
+scripts/config --enable DEBUG_INFO_DWARF4
+```
+**O que faz:** O kernel RT não precisa de BTF (BPF Type Format).
+O kernel Linux moderno tenta gerar automaticamente uma seção chamada BTF (BPF Type Format).
+
+Essa seção é usada pelo eBPF, ferramentas de observabilidade como bpftrace e CO-RE, além de módulos avançados de tracing.
+
+Durante o build do kernel, o BTF é gerado pelo programa pahole (do pacote dwarves).
+
 ```bash
 make olddefconfig
 ```
@@ -139,7 +151,7 @@ make menuconfig
 ```
 **O que faz:** Abre uma interface gráfica no terminal para configurar as opções do kernel.
 
-### Configurações importantes no menuconfig:
+### ⚠️ Configurações importantes no menuconfig:
 
 Navegue até: `General setup` → `Preemption Model`
 
@@ -161,7 +173,7 @@ scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 
 ---
 
-## 6. Compilação do Kernel
+## 7. Compilação do Kernel
 
 ```bash
 make -j$(nproc)
@@ -179,7 +191,7 @@ make modules -j$(nproc)
 
 ---
 
-## 7. Instalação do Kernel
+## 8. Instalação do Kernel
 
 ```bash
 sudo make modules_install
@@ -193,7 +205,7 @@ sudo make install
 
 ---
 
-## 8. Configuração do GRUB
+## 9. Configuração do GRUB
 
 ```bash
 sudo update-grub
@@ -223,7 +235,7 @@ sudo update-grub
 
 ---
 
-## 9. Verificação da Instalação
+## 10. Verificação da Instalação
 
 ```bash
 sudo reboot
