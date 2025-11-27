@@ -22,6 +22,7 @@ https://www.virtualbox.org/wiki/Downloads
 Instalar em máquina virtual com minimo 30GB de espaço em disco.
 
 ### Terminal:
+Preparando pastas e downloading:
 ```
 mkdir ~/kernel
 cd ~/kernel
@@ -29,10 +30,16 @@ wget https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.gz
 wget https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/6.14/patch-6.14-rt3.patch.xz
 tar -xvf linux-6.14.tar.gz
 xz -d patch-6.14-rt3.patch.xz
+```
+Patch kernel:
+```
 cd linux-6.14
 patch -p1 <../patch-6.1.158-rt58.patch
 cp /boot/config-6.14.0-27-generic .config
 make oldconfig
+```
+Instalação de bibliotecas essenciais:
+```
 sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk git libnuma-dev
 ```
 Antes de executar o Menuconfig, **maxime** o terminal.
