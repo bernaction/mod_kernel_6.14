@@ -14,13 +14,23 @@ cd ~/kernel
 
 wget https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.gz
 
-wget https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/6.1/patch-6.1.158-rt58.patch.xz
+wget https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/6.14/patch-6.14-rt3.patch.xz
 
 tar -xvf linux-6.14.tar.gz
 
-xz -d patch-6.1.158-rt58.patch.xz
+xz -d patch-6.14-rt3.patch.xz
 
 cd linux-6.14
 
 patch -p1 <../patch-6.1.158-rt58.patch
+
+cp /boot/config-6.14.0-generic .config
+
+sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk
+
+make menuconfig
+
+# Ativar a opção “Fully Preemptible Kernel (Real-Time)” em “General setup” / “Preemption Model”. 
+
+Após salvar em SAVE e sair em EXIT.
 
