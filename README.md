@@ -33,7 +33,7 @@ cd linux-6.14
 patch -p1 <../patch-6.1.158-rt58.patch
 cp /boot/config-6.14.0-27-generic .config
 make oldconfig
-sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk git
+sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk git libnuma-dev
 ```
 Antes de executar o Menuconfig, **maxime** o terminal.
 ```
