@@ -151,19 +151,14 @@ Selecione: `Fully Preemptible Kernel (Real-Time)`
 Após configurar, salve e saia (selecione `Save` e depois `Exit`).
 
 ```bash
-scripts/config --disable SYSTEM_TRUSTED_KEYS
+scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 ```
 **O que faz:** Desabilita a verificação de chaves confiáveis do sistema para evitar erros de compilação.
 
 ```bash
-scripts/config --disable SYSTEM_REVOCATION_KEYS
+scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 ```
 **O que faz:** Desabilita a lista de revogação de chaves para evitar erros de compilação.
-
-```bash
-scripts/config --set-str CONFIG_LOCALVERSION "-rt-custom"
-```
-**O que faz:** Define um sufixo personalizado para identificar seu kernel compilado.
 
 ---
 
