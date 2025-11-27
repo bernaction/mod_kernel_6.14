@@ -21,7 +21,7 @@ Este guia apresenta o passo a passo completo para compilar e instalar um kernel 
 
 ## Pré-requisitos
 
-- [Imagem Lubuntu]([versão 24.04.3])(https://cdimage.ubuntu.com/lubuntu/releases/noble/release/lubuntu-24.04.3-desktop-amd64.iso): 
+- [Imagem Lubuntu](https://cdimage.ubuntu.com/lubuntu/releases/noble/release/lubuntu-24.04.3-desktop-amd64.iso) - versão 24.04.3 LTS
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads) - Instalar em máquina virtual com minimo 30GB de espaço em disco.
 - Conexão com a internet
 - Pelo menos 30GB de espaço livre em disco
