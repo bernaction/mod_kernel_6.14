@@ -34,7 +34,7 @@ xz -d patch-6.14-rt3.patch.xz
 Patch kernel:
 ```
 cd linux-6.14
-patch -p1 <../patch-6.1.158-rt58.patch
+patch -p1 <../patch-6.14-rt3.patch
 cp /boot/config-6.14.0-27-generic .config
 make oldconfig
 ```
