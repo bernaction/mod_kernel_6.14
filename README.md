@@ -52,17 +52,20 @@ sudo apt dist-upgrade -y
 ## 2. Instalação de Dependências
 
 ```bash
-sudo apt install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev dwarves zstd fakeroot wget curl
+sudo apt install -y build-essential libdwarf-dev libncurses-dev libdw-dev bison flex libssl-dev libelf-dev dwarves zstd elfutils fakeroot wget curl
 ```
 **O que faz:**
 - `build-essential`: Instala compiladores (gcc, g++) e ferramentas essenciais para compilação
+- `libdwarf-dev`: Fornece o header dwarf.h, necessário para scripts do kernel que lidam com informações de debug.
 - `libncurses-dev`: Biblioteca para interface de menus no terminal (usada pelo menuconfig)
+- `libdw-dev`: Bibliotecas para ler e manipular informações DWARF usadas pelo kernel (depende de elfutils).
 - `bison`: Gerador de analisadores sintáticos, necessário para compilar o kernel
 - `flex`: Gerador de analisadores léxicos, trabalha junto com o bison
 - `libssl-dev`: Bibliotecas de desenvolvimento SSL para assinatura de módulos
 - `libelf-dev`: Bibliotecas para manipulação de arquivos ELF (formato executável do Linux)
 - `dwarves`: Ferramentas para manipulação de informações de debug (inclui pahole, necessário para BTF)
 - `zstd`: Algoritmo de compressão usado pelo kernel moderno
+- `elfutils`: Ferramentas para leitura/manipulação de ELF e DWARF (objdump, readelf modernos).
 - `fakeroot`: Permite executar comandos como se fosse root sem privilégios reais (para criar pacotes)
 - `wget`: Ferramenta de linha de comando para download de arquivos
 - `curl`: Ferramenta para transferência de dados via URLs
@@ -73,10 +76,6 @@ sudo apt install -y build-essential libncurses-dev bison flex libssl-dev libelf-
 
 ```bash
 cd ~
-```
-**O que faz:** Muda para o diretório home do usuário atual.
-
-```bash
 mkdir -p kernel-rt && cd kernel-rt
 ```
 **O que faz:** Cria um diretório chamado `kernel-rt` (se não existir) e entra nele. O `-p` evita erro se o diretório já existir.
@@ -163,11 +162,6 @@ scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 ---
 
 ## 6. Compilação do Kernel
-
-```bash
-nproc
-```
-**O que faz:** Mostra o número de núcleos de processamento disponíveis no seu sistema.
 
 ```bash
 make -j$(nproc)
