@@ -24,13 +24,37 @@ cd linux-6.14
 
 patch -p1 <../patch-6.1.158-rt58.patch
 
-cp /boot/config-6.14.0-generic .config
+cp /boot/config-6.14.0-27-generic .config
 
-sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk
+make oldconfig
+
+sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk git
 
 make menuconfig
 
 # Ativar a opção “Fully Preemptible Kernel (Real-Time)” em “General setup” / “Preemption Model”. 
 
-Após salvar em SAVE e sair em EXIT.
+# Após salvar em SAVE e sair em EXIT.
+
+#No arquivo .config :
+
+# Limpar as keys dentro das aspas
+
+CONFIG_SYSTEM_TRUSTED_KEYS=""
+
+CONFIG_SYSTEM_REVOCATION_KEYS=""
+
+scripts/config --disable SYSTEM_REVOCATION_KEYS
+
+make -jX (X = numero de nucleos da vm)
+
+sudo make modules_install
+
+sudo make install
+
+sudo update-grub
+
+sudo reboot
+
+
 
