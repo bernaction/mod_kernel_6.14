@@ -22,6 +22,9 @@ patch -p1 <../patch-6.1.158-rt58.patch
 cp /boot/config-6.14.0-27-generic .config
 make oldconfig
 sudo apt update && sudo apt install -y make gcc libncurses-dev libssl-dev flex libelf-dev bison libdw-dev libdwarf-dev elfutils libelf-dev gawk git
+```
+Antes de executar o Menuconfig, **maxime** o terminal.
+```
 make menuconfig
 ```
 
@@ -54,5 +57,14 @@ sudo update-grub
 sudo shutdown -r now
 ```
 
+## Após reiniciar:  
+```
+uname -a
+```
+Você verá uma tela tela com as informações (exemplo)
 
+```Linux <nome da distro> <versão>-rt<versão> #1 SMP PREEMPT RT <data hora GMT ano> <arquitetura> GNU/Linux```
 
+## Algumas recomendações para compilar
+- O disco tem que ser no mínimo de 20 GB (o PREEMPT_RT é maior que o kernel simples), porém 20 GB tende a sobrar menos de 2 GB para codificar ou fazer outras aplicações;
+- Se fizer em um Máquina Virtual, aconselho a criar um segundo disco ligado a máquina com mais 20 GB (pelo menos) e compilar lá o kernel novo, pois assim, consegue excluir essas informações depois de atualizar o kernel
