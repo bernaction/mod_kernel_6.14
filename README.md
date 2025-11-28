@@ -245,7 +245,7 @@ sudo reboot
 Após reiniciar:
 
 ```bash
-uname -r
+sudo uname -r
 ```
 **O que faz:** Exibe a versão do kernel em execução. Deve mostrar algo como `6.14.0-rt7-rt-custom`.
 
