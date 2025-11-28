@@ -19,10 +19,6 @@ scripts/config --disable PREEMPT_NONE
 scripts/config --disable PREEMPT_VOLUNTARY
 scripts/config --disable PREEMPT
 scripts/config --enable PREEMPT_RT
-make menuconfig
-```
-
-```bash
 scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
 make -j$(nproc)
