@@ -1,8 +1,17 @@
+## Primeira parte
+- atualiza o sistema
+- instala todas as dependências
+- baixa o kernel e o patch PREEMPT_RT
+- aplica o patch
+- prepara a configuração
+- ativa o modo Real-Time via comandos
+- compila o kernel
 ```bash
 sudo apt update
 sudo apt upgrade -y
 sudo apt dist-upgrade -y
-sudo apt install -y build-essential libdwarf-dev libncurses-dev libdw-dev bison flex libssl-dev libelf-dev dwarves zstd elfutils fakeroot wget curl
+sudo apt install -y build-essential libdwarf-dev libncurses-dev libdw-dev \
+  bison flex libssl-dev libelf-dev dwarves zstd elfutils fakeroot wget curl
 cd ~
 mkdir -p kernel-rt && cd kernel-rt
 wget https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.gz
@@ -25,6 +34,12 @@ make olddefconfig
 make -j$(nproc)
 ```
 
+## Segunda parte
+- compila os módulos
+- instala os módulos no sistema
+- instala o kernel em /boot
+- atualiza o GRUB
+- reinicia
 ```bash
 make modules -j$(nproc)
 sudo make modules_install
@@ -33,6 +48,11 @@ sudo update-grub
 sudo reboot
 ```
 
+## Terceira parte
+- versão do kernel
+- flags PREEMPT_RT
+- se o kernel realmente está em modo real-time
+- mensagens do dmesg confirmando RT
 ```bash
 uname -r
 uname -v
