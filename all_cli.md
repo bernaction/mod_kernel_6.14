@@ -21,6 +21,7 @@ scripts/config --disable PREEMPT
 scripts/config --enable PREEMPT_RT
 scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ""
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ""
+make olddefconfig
 make -j$(nproc)
 ```
 
