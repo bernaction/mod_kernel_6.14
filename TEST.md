@@ -1,5 +1,5 @@
 
-## Parte 1 – Análise de Linux Kernel RT
+# Parte 1 – Análise de Linux Kernel RT
 
 ```bash
 sudo apt install libnuma-dev
@@ -11,15 +11,54 @@ make install
 
 make cyclictest
 ```
-### Teste padrão 1:
+
+## Teste padrão 1:
 ```bash
 sudo cyclictest -p99 -t -n -m
 ```
+### Resultados observados:
 
-### Teste padrão 2:
+| Thread | Prioridade | Intervalo (µs) | Min (µs) | Act (µs) | Avg (µs) | Max (µs) |
+|--------|------------|----------------|----------|-----------|-----------|-----------|
+| T:0 | 99 | 1000 | 20 | 118 | 261 | 758793 |
+| T:1 | 99 | 1500 | 19 | 96 | 314 | 759119 |
+| T:2 | 99 | 2000 | 12 | 264 | 319 | 759229 |
+| T:3 | 99 | 2500 | 12 | 391 | 322 | 7578744 |
+| T:4 | 99 | 3000 | 18 | 107 | 357 | 7625422 |
+| T:5 | 99 | 3500 | 21 | 284 | 344 | 762714 |
+
+### Interpretação
+- Latências mínimas entre 12–21 µs.
+- Latências médias entre 260–357 µs.
+- Spikes máximos chegam a 7–8 ms devido ao ambiente virtualizado.
+- Valores compatíveis com ambientes VM mesmo com PREEMPT_RT.
+
+
+
+## Teste padrão 2:
 ```bash
 sudo cyclictest -a -t -p99 -n -m
 ```
+
+### Resultados observados:
+
+| Thread | Prioridade | Intervalo (µs) | Min (µs) | Act (µs) | Avg (µs) | Max (µs) |
+|--------|------------|----------------|----------|-----------|-----------|-----------|
+| T:0 | 99 | 1000 | 31 | 186 | 301 | 12049 |
+| T:1 | 99 | 1500 | 29 | 1009 | 339 | 10852 |
+| T:2 | 99 | 2000 | 24 | 696 | 307 | 10427 |
+| T:3 | 99 | 2500 | 30 | 772 | 369 | 10434 |
+| T:4 | 99 | 3000 | 27 | 218 | 384 | 10176 |
+| T:5 | 99 | 3500 | 28 | 879 | 372 | 10329 |
+
+### Interpretação
+- Latência mínima 24–31 µs, ligeiramente maior que no teste 1, porém estável.
+- Latências médias ~300–384 µs.
+- Spikes máximos reduzidos para ~10–12 ms.
+- Afinidade de CPU melhora previsibilidade e reduz jitter.
+
+
+
 
 ### Teste de latência de semáforo
 ```bash
