@@ -2,6 +2,7 @@
 ## Parte 1 – Análise de Linux Kernel RT
 
 ```bash
+sudo apt install libnuma-dev
 git clone git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 cd rt-tests
 git checkout stable/v1.0
@@ -10,6 +11,31 @@ make install
 
 make cyclictest
 ```
+### Teste padrão 1:
+```bash
+sudo cyclictest -p99 -t -n -m
+```
+
+### Teste padrão 2:
+```bash
+sudo cyclictest -a -t -p99 -n -m
+```
+
+### Teste de latência de hardware
+```bash
+sudo hwlatdetect --duration=30 --threshold=10
+```
+
+### Teste de latência de semáforo
+```bash
+sudo ptsematest -a -t -p99 -n
+```
+
+
+
+
+
+---
 
 ## Parte 2 – Evoluir o Trabalho da M2 e a Análise Temporal
 
