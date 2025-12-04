@@ -1,0 +1,34 @@
+# Executáveis compilados
+src/esteira_linux
+src/servidor_periodico
+*.out
+*.exe
+
+# Objetos
+*.o
+*.a
+*.so
+
+# Kernel build
+kernel-rt/
+linux-*/
+*.tar.gz
+*.tar.xz
+*.patch
+*.patch.xz
+
+# Logs e temporários
+*.log
+*.swp
+*.swo
+*~
+.*.swp
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

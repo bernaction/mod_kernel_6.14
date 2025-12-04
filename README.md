@@ -2,6 +2,15 @@
 
 Este guia apresenta o passo a passo completo para compilar e instalar um kernel Linux com o patch PREEMPT_RT, transformando o Lubuntu em um sistema operacional de tempo real.
 
+## 📚 Documentação do Projeto
+
+- **[QUICKSTART.md](QUICKSTART.md)** → 🚀 Guia rápido de uso (comece aqui!)
+- **[FULL_CLI.md](FULL_CLI.md)** → 📋 Comandos consolidados (copiar/colar)
+- **[TEST.md](TEST.md)** → 🧪 Testes de validação RT (cyclictest, ptsematest)
+- **[RESULTADOS.md](RESULTADOS.md)** → 📊 Template para seus resultados
+- **[src/README_LINUX.md](src/README_LINUX.md)** → 📖 Documentação técnica detalhada
+- **[src/ADAPTACAO.md](src/ADAPTACAO.md)** → 🔄 Detalhes da adaptação ESP32→Linux
+
 ## 💽 Requisitos mínimos de hardware (VM VirtualBox)
 
 Para evitar erros de build (falta de RAM, falta de espaço ou kernel sendo "Killed"):
@@ -264,6 +273,39 @@ cat /sys/kernel/realtime
 dmesg | grep -i "preempt"
 ```
 **O que faz:** Procura mensagens do kernel relacionadas a preemption. Deve mostrar informações sobre PREEMPT_RT.
+
+---
+
+## 🏭 Código Adaptado - Esteira Industrial RT
+
+Após instalar o kernel PREEMPT_RT, você pode executar os programas de tempo real adaptados:
+
+### Compilação
+
+```bash
+cd src
+make
+```
+
+Isso compila:
+- `esteira_linux` → Simulação da esteira industrial com 4 tarefas RT
+- `servidor_periodico` → Servidor periódico para tarefas aperiódicas
+
+### Execução
+
+```bash
+# Esteira industrial
+sudo ./esteira_linux
+
+# Servidor periódico (Ts=10ms, Cs=5ms, prio=70, 60s)
+sudo ./servidor_periodico 10 5 70 60
+```
+
+### Documentação Completa
+
+- **[src/README_LINUX.md](src/README_LINUX.md)** → Arquitetura e uso detalhado
+- **[src/ADAPTACAO.md](src/ADAPTACAO.md)** → ESP32 vs Linux, APIs, métricas
+- **[QUICKSTART.md](QUICKSTART.md)** → Guia rápido de execução
 
 ---
 
