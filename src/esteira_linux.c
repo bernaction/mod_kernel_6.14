@@ -27,6 +27,9 @@
 #include <sched.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <sys/select.h>
 
 #define TAG "ESTEIRA"
 
@@ -417,31 +420,95 @@ static void *task_input(void *arg) {
     printf("\n=== Esteira Industrial - Linux RTOS ===\n");
     printf("Comandos: b=OBJ  d=E-STOP  h=HMI  q=quit\n\n");
     
+    // Configura stdin não-bloqueante
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    
     while (running) {
+        // Usa select com timeout para poder sair quando running=false
+        fd_set readfds;
+        struct timeval tv;
+        FD_ZERO(&readfds);
+        FD_SET(STDIN_FILENO, &readfds);
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000; // 100ms timeout
+        
+        int ret = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &tv);
+        if (ret <= 0) continue; // timeout ou erro, verifica running novamente
+        
         char ch = getchar();
+        if (ch == EOF || ch == (char)-1) continue;
+        
         if (ch == 'q' || ch == 'Q') {
             running = false;
             break;
         } else if (ch == 'b' || ch == 'B') {
+            char ts[64];
+            time_t now = time(NULL);
+            struct tm *tm_info = localtime(&now);
+            struct timespec tspec;
+            clock_gettime(CLOCK_REALTIME, &tspec);
+            snprintf(ts, sizeof(ts), "%02d/%02d/%04d %02d:%02d:%02d.%03ld",
+                     tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900,
+                     tm_info->tm_hour, tm_info->tm_min, tm_info->tm_sec,
+                     tspec.tv_nsec / 1000000);
+            printf("[%s] >>> EVENTO 'b' RECEBIDO - SORT_ACT disparado\n", ts);
+            fflush(stdout);
             sem_post(&semSort);
         } else if (ch == 'd' || ch == 'D') {
+            char ts[64];
+            time_t now = time(NULL);
+            struct tm *tm_info = localtime(&now);
+            struct timespec tspec;
+            clock_gettime(CLOCK_REALTIME, &tspec);
+            snprintf(ts, sizeof(ts), "%02d/%02d/%04d %02d:%02d:%02d.%03ld",
+                     tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900,
+                     tm_info->tm_hour, tm_info->tm_min, tm_info->tm_sec,
+                     tspec.tv_nsec / 1000000);
+            printf("[%s] >>> EVENTO 'd' RECEBIDO - E-STOP ativado!\n", ts);
+            fflush(stdout);
             sem_post(&semEStop);
         } else if (ch == 'h' || ch == 'H') {
-            sem_post(&semHMI);
+            char ts[64];
+            time_t now = time(NULL);
+            struct tm *tm_info = localtime(&now);
+            struct timespec tspec;
+            clock_gettime(CLOCK_REALTIME, &tspec);
+            snprintf(ts, sizeof(ts), "%02d/%02d/%04d %02d:%02d:%02d.%03ld",
+                     tm_info->tm_mday, tm_info->tm_mon + 1, tm_info->tm_year + 1900,
+                     tm_info->tm_hour, tm_info->tm_min, tm_info->tm_sec,
+                     tspec.tv_nsec / 1000000);
             pthread_mutex_lock(&belt_mutex);
+            float old_rpm = g_belt.set_rpm;
             g_belt.set_rpm += 20.0f;
             if (g_belt.set_rpm > 500.f) g_belt.set_rpm = 120.f;
             pthread_mutex_unlock(&belt_mutex);
+            printf("[%s] >>> EVENTO 'h' RECEBIDO - HMI: set_rpm %.1f -> %.1f RPM\n", ts, old_rpm, g_belt.set_rpm);
+            fflush(stdout);
+            sem_post(&semHMI);
             printf("HMI: set_rpm=%.1f\n", g_belt.set_rpm);
         }
     }
+    
+    // Restaura stdin bloqueante ao sair
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags & ~O_NONBLOCK);
+    
     return NULL;
 }
 
 // ====== Signal handler ======
 static void signal_handler(int sig) {
     (void)sig;
+    printf("\n>>> Sinal recebido (Ctrl+C), finalizando...\n");
+    fflush(stdout);
     running = false;
+    
+    // Desbloqueia todas as threads travadas em sem_wait
+    sem_post(&semCtrlNotify);
+    sem_post(&semSort);
+    sem_post(&semEStop);
+    sem_post(&semHMI);
 }
 
 // ====== main ======

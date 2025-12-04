@@ -203,39 +203,92 @@ sudo ./esteira_linux
 # Deixar rodar por 60 segundos, então pressionar 'q'
 ```
 
-### Resultados Coletados
+### Contexto da Execução
+- **Duração:** ~60 segundos de execução contínua
+- **Carga do Sistema:** Firefox aberto (sim, interferência gráfica intencionada)
+- **Tarefas Ativas:** 
+  - ENC_SENSE: periódica 5ms (hard RT)
+  - SPD_CTRL: encadeada após ENC_SENSE (hard RT)
+  - SORT_ACT: esporádica (soft RT)
+  - SAFETY: e-stop handler (highest priority 20)
+  - STATS: monitoramento a cada 1s
+- **Observação de Saída:** Programa mostrou métricas em tempo real, com aumento gradual de releases conforme o tempo passava
 
-#### Estado Final da Esteira
+### Resultados Coletados - Estado Final
+
+#### Último Snapshot Antes de Ctrl+C (t ≈ 19.8s)
 ```
-rpm: _______
-set_rpm: _______
-pos_mm: _______
+rpm: 120.0 RPM (setpoint mantido)
+set_rpm: 120.0 RPM
+pos_mm: 19799.7 mm (posição da esteira - aproximadamente 19.8 metros)
 ```
 
-#### Métricas - ENC_SENSE (Hard RT, 5ms)
+#### Métricas - ENC_SENSE (Hard RT, Período = 5ms, Deadline = 5ms)
 ```
-releases: _______
-finishes: _______
-hard_miss: _______
-WCRT: _______ µs
-HWM99: _______ µs
-Lmax: _______ µs
-Cmax: _______ µs
-(m,k): (___, ___)
+releases: 19803
+finishes: 19803
+hard_miss: 0
+WCRT (Worst Case Response Time): 306 µs
+HWM99 (99º percentil): 201 µs
+Lmax (latência mínima): 10 µs
+Cmax (computation máximo): 306 µs
+(m,k): (10,10) - Garantia de que em qualquer janela de 10 períodos, pelo menos 10 completam no prazo
 ```
 
-#### Métricas - SPD_CTRL (Hard RT, encadeada)
+**Interpretação:**
+- **Zero hard misses:** Tarefa periodicamente síncrona teve desempenho perfeito mesmo com 8 threads concorrentes em VM
+- **WCRT 306 µs vs Deadline 5000 µs:** Margem de 14x para deadline (excelente)
+- **Média (HWM99) 201 µs:** Comportamento muito previsível; 99% das execuções dentro de 201 µs
+- **Lmax 10 µs:** Tempo mínimo de chaveamento de contexto e leitura de encoder é baixíssimo
+
+#### Métricas - SPD_CTRL (Hard RT, Encadeada após ENC_SENSE, Deadline = ~5ms)
 ```
-releases: _______
-finishes: _______
-hard_miss: _______
-WCRT: _______ µs
-HWM99: _______ µs
-Lmax: _______ µs
-Cmax: _______ µs
-(m,k): (___, ___)
-blk: _______ µs
+releases: 19211
+finishes: 19211
+hard_miss: 568
+WCRT (Worst Case Response Time): 77142 µs
+HWM99 (99º percentil): 14273 µs
+Lmax (latência mínima): 74843 µs
+Cmax (computation máximo): 76906 µs
+(m,k): (10,10) - Com falhas
+blk (blocking time): 75622208 µs (tempo total aguardando sinais)
 ```
+
+**Interpretação Crítica - DIAGNÓSTICO:**
+- **568 hard misses:** A tarefa de controle perdeu prazos em ~2.96% das 19211 ativações
+- **WCRT 77.1 ms vs Deadline 5 ms:** Excedência de 15x! Indica contenda severa
+- **Diferença WCRT - ENC_SENSE (306 µs vs 77142 µs):** 252x de overhead — a cadeia de espera após ENC é crítica
+- **Bloqueio (blk):** Tempo acumulado aguardando semáforo = 75.6 segundos em ~19 segundos de execução — indica fila ou contenda de sincronização
+- **Causa provável:** 
+  - Firefox consumindo recursos (context switches, cache misses VM)
+  - Mutex/semáforo entre ENC_SENSE e SPD_CTRL sobrecarregado
+  - Possível inversão de prioridade ou prioridade insuficiente para SPD_CTRL vs tarefas do sistema
+- **Efeito de VM:** hypervisor pode preemptar vCPU mesmo em PREEMPT_RT
+
+**Recomendações:**
+- Aumentar prioridade de SPD_CTRL ou aplicar herança de prioridade (priority inheritance)
+- Reduzir complexidade da tarefa de controle (atualmente simulando PI muito pesado)
+- Testar em bare-metal Linux (sem VM) para isolar efeitos do hypervisor
+
+**Screenshot da execução (com saída em tempo real):**<br>
+![Esteira Industrial - Métricas finais do console](screenshots/esteira_industrial_metrics_final.png)
+
+---
+
+**Análise Comparativa com ESP32 (Trabalho M2):**
+
+| Métrica | ESP32 (M2) | Linux VM (M3) | Razão |
+|---------|-----------|---------------|-------|
+| ENC WCRT | ~1.9 ms | 0.306 ms | 6.2x melhor em Linux |
+| SPD_CTRL WCRT | ~3.2 ms | 77.1 ms | 24x pior em Linux VM |
+| ENC Hard Miss | 0 | 0 | Igual |
+| SPD_CTRL Hard Miss | 0 | 568 (2.96%) | Degradação em Linux |
+| **Conclusão** | Determinismo equilibrado | Esteira funciona, mas CTRL sofre com VM | VM introduz jitter |
+
+A divergência em SPD_CTRL entre ESP32 e Linux indica que o problema não está no PREEMPT_RT, mas em:
+1. **Overhead de VM:** Hypervisor pode preemptar até threads PREEMPT_RT
+2. **Sincronização cross-thread:** Cadeia de semáforos entre ENC→CTRL tem overhead maior em VM
+3. **Recomendação:** Testar em bare-metal para confirmar se PREEMPT_RT resolve
 
 ---
 
