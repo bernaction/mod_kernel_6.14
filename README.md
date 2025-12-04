@@ -6,8 +6,8 @@ Este guia apresenta o passo a passo completo para compilar e instalar um kernel 
 
 - **[QUICKSTART.md](QUICKSTART.md)** → 🚀 Guia rápido de uso (comece aqui!)
 - **[FULL_CLI.md](FULL_CLI.md)** → 📋 Comandos consolidados (copiar/colar)
-- **[TEST.md](TEST.md)** → 🧪 Testes de validação RT (cyclictest, ptsematest)
-- **[RESULTADOS.md](RESULTADOS.md)** → 📊 Template para seus resultados
+- **[RESULTADOS.md](RESULTADOS.md)** → 🧪📊 Testes RT (Parte 1) + resultados da esteira (Parte 2)
+  (este arquivo consolida o conteúdo de TEST.md)
 - **[src/README_LINUX.md](src/README_LINUX.md)** → 📖 Documentação técnica detalhada
 - **[src/ADAPTACAO.md](src/ADAPTACAO.md)** → 🔄 Detalhes da adaptação ESP32→Linux
 
